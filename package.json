@@ -1,0 +1,20 @@
+{
+  "name": "sheet-showcase",
+  "private": true,
+  "description": "Turn an Excel or CSV sheet into a clean, searchable web page.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test",
+    "e2e": "node --test tests/e2e/*.e2e.mjs",
+    "screenshots": "node tests/e2e/screenshots.mjs",
+    "perf": "node tests/e2e/perf.mjs"
+  },
+  "devDependencies": {
+    "axe-core": "^4.14.0",
+    "playwright": "^1.56.0"
+  }
+}

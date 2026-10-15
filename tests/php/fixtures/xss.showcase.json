@@ -1,0 +1,29 @@
+{
+    "title": "<script>alert(\"title\")</script>",
+    "subtitle": "</script><img src=x onerror=alert(9)>",
+    "filters": [
+        "Category"
+    ],
+    "columns": [
+        {
+            "name": "Name",
+            "type": "text"
+        },
+        {
+            "name": "Website",
+            "type": "url"
+        },
+        {
+            "name": "Photo",
+            "type": "image"
+        },
+        {
+            "name": "Contact",
+            "type": "email"
+        },
+        {
+            "name": "Notes",
+            "type": "text"
+        }
+    ]
+}

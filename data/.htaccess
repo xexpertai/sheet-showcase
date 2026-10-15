@@ -1,0 +1,2 @@
+# Data files are read by PHP only; never serve them directly (Apache 2.4).
+Require all denied

@@ -1,0 +1,120 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * sheet-showcase command line.
+ *
+ *   php bin/showcase export <data.xlsx|data.csv> [-o dist/page.html]
+ *   php bin/showcase inspect <data.xlsx|data.csv> [--json]
+ */
+
+declare(strict_types=1);
+
+error_reporting(E_ALL);
+
+require __DIR__ . '/../src/autoload.php';
+
+use SheetShowcase\Exporter;
+use SheetShowcase\Showcase;
+use SheetShowcase\ShowcaseException;
+
+const USAGE = <<<TXT
+sheet-showcase — turn a spreadsheet into a searchable web page
+
+Usage:
+  php bin/showcase export <file.xlsx|file.csv> [-o <out.html>]
+      Write ONE self-contained HTML file (default: dist/<name>.html).
+  php bin/showcase inspect <file.xlsx|file.csv> [--json]
+      Print the inferred schema (columns, types, filters, sort).
+  php bin/showcase help
+
+An optional showcase.json next to the data file configures the page.
+
+TXT;
+
+/**
+ * @param list<string> $args
+ */
+function main(array $args): int
+{
+    $command = array_shift($args) ?? 'help';
+    $file = null;
+    $out = null;
+    $json = false;
+    while ($args !== []) {
+        $a = array_shift($args);
+        if ($a === '-o' || $a === '--output') {
+            $out = array_shift($args) ?? throw new ShowcaseException('-o needs a file name.');
+        } elseif (str_starts_with($a, '--output=')) {
+            $out = substr($a, 9);
+        } elseif ($a === '--json') {
+            $json = true;
+        } elseif ($file === null && !str_starts_with($a, '-')) {
+            $file = $a;
+        } else {
+            throw new ShowcaseException("Unexpected argument: $a");
+        }
+    }
+
+    switch ($command) {
+        case 'help':
+        case '--help':
+        case '-h':
+            fwrite(STDOUT, USAGE);
+
+            return 0;
+
+        case 'export':
+            if ($file === null) {
+                throw new ShowcaseException('export needs a data file.');
+            }
+            $out ??= 'dist/' . pathinfo($file, PATHINFO_FILENAME) . '.html';
+            $bytes = (new Exporter())->export($file, $out);
+            fwrite(STDOUT, sprintf("Wrote %s (%s KB)\n", $out, number_format($bytes / 1024, 1)));
+
+            return 0;
+
+        case 'inspect':
+            if ($file === null) {
+                throw new ShowcaseException('inspect needs a data file.');
+            }
+            $s = Showcase::fromFile($file);
+            $schema = [
+                'title' => $s->title,
+                'subtitle' => $s->subtitle,
+                'rows' => count($s->rows),
+                'layout' => $s->layout,
+                'theme' => $s->theme,
+                'accent_color' => $s->accent,
+                'currency' => $s->currency,
+                'locale' => $s->locale,
+                'filters' => $s->filters,
+                'sort_default' => $s->sortKey === null ? null : ($s->sortDir === 'desc' ? '-' : '') . $s->sortKey,
+                'columns' => array_map(static fn ($c) => ['name' => $c->header, 'key' => $c->key, 'label' => $c->label, 'type' => $c->type], $s->columns),
+            ];
+            if ($json) {
+                fwrite(STDOUT, json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n");
+
+                return 0;
+            }
+            fwrite(STDOUT, sprintf("%s — %d rows, layout %s, theme %s\n", $s->title, count($s->rows), $s->layout, $s->theme));
+            fwrite(STDOUT, sprintf("%-24s %-24s %-18s %s\n", 'COLUMN', 'LABEL', 'KEY', 'TYPE'));
+            foreach ($s->columns as $c) {
+                $flags = in_array($c->key, $s->filters, true) ? '  [filter]' : '';
+                $flags .= $c->key === $s->sortKey ? '  [sort ' . $s->sortDir . ']' : '';
+                fwrite(STDOUT, sprintf("%-24s %-24s %-18s %s%s\n", mb_strimwidth($c->header, 0, 23, '…'), mb_strimwidth($c->label, 0, 23, '…'), $c->key, $c->type, $flags));
+            }
+
+            return 0;
+
+        default:
+            throw new ShowcaseException("Unknown command: $command (try: help)");
+    }
+}
+
+try {
+    exit(main(array_slice($argv, 1)));
+} catch (ShowcaseException $e) {
+    fwrite(STDERR, 'Error: ' . $e->getMessage() . "\n");
+    exit(1);
+}

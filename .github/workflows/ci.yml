@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: PHP ${{ matrix.php }} + Node
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.1', '8.3']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, xml, xmlreader, zip, dom
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install PHPUnit (dev only)
+        run: composer install --no-interaction --no-progress
+
+      - name: Lint PHP
+        run: |
+          for f in $(find src public templates tests/php tools -name '*.php') bin/showcase; do php -l "$f" >/dev/null || exit 1; done
+
+      - name: Lint JS
+        run: for f in public/assets/*.js tests/js/*.js tests/e2e/*.mjs; do node --check "$f"; done
+
+      - name: PHPUnit
+        run: composer test
+
+      - name: node --test
+        run: node --test
+
+  e2e:
+    name: Browser tests (Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, xmlreader, zip
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e
+      - run: npm run perf

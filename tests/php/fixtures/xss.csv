@@ -1,0 +1,5 @@
+Name,Website,Photo,Contact,Notes,Category
+<script>alert(1)</script>,javascript:alert(1),javascript:alert(2),x@example.org,</script><script>alert(3)</script>,A
+"""><img src=x onerror=alert(1)>",https://example.org/ok,"https://example.org/x.png"" onerror=""alert(4)","bad""@x",<!-- </script>,A
+'><svg onload=alert(5)>,JaVaScRiPt:alert(6),"data:image/svg+xml,<svg onload=alert(7)>",y@example.org,{{constructor.constructor('alert(8)')()}},B
+Normal row,https://example.org/,,z@example.org,"=HYPERLINK(""http://evil.example"",""x"")",B

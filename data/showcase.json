@@ -1,0 +1,89 @@
+{
+    "theme": "auto",
+    "locale": "en-GB",
+    "sheets": {
+        "cafe-menu": {
+            "title": "Café Lumen — Menu",
+            "subtitle": "Fictional sample data: an invented café with invented prices.",
+            "layout": "cards",
+            "currency": "EUR",
+            "accent_color": "#9a3412",
+            "columns": [
+                {
+                    "name": "Item"
+                },
+                {
+                    "name": "Price",
+                    "type": "currency"
+                },
+                {
+                    "name": "Category"
+                },
+                {
+                    "name": "Diet"
+                },
+                {
+                    "name": "Description"
+                }
+            ],
+            "filters": [
+                "Category",
+                "Diet"
+            ]
+        },
+        "club-members": {
+            "title": "Riverside Running Club — Members",
+            "subtitle": "Fictional sample data: every name and email address is made up.",
+            "layout": "table",
+            "filters": [
+                "Team",
+                "Role",
+                "City"
+            ],
+            "sort_default": "Name",
+            "columns": [
+                "Name",
+                "Role",
+                "Team",
+                "City",
+                "Email",
+                {
+                    "name": "Member since",
+                    "label": "Joined"
+                }
+            ]
+        },
+        "event-schedule": {
+            "title": "Community Events 2026",
+            "subtitle": "Fictional sample data: invented events at invented venues.",
+            "layout": "cards",
+            "currency": "EUR",
+            "accent_color": "#047857",
+            "sort_default": "Date",
+            "filters": [
+                "Category",
+                "Venue"
+            ],
+            "columns": [
+                {
+                    "name": "Event"
+                },
+                {
+                    "name": "Date"
+                },
+                {
+                    "name": "Start"
+                },
+                {
+                    "name": "Price",
+                    "type": "currency",
+                    "label": "Ticket"
+                },
+                {
+                    "name": "Details",
+                    "label": "More info"
+                }
+            ]
+        }
+    }
+}

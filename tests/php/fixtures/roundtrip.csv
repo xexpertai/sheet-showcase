@@ -1,0 +1,5 @@
+Name,Qty,Price,Active,Notes,Since
+Widget,3,4.5,TRUE,Shared note,2024-02-29
+Gadget,10,12,FALSE,,1999-12-31
+Gizmo,0,0.1,TRUE,Shared note,2026-10-15
+Doohickey,13,-2.75,FALSE,ünïcödé ✓,1970-01-01
